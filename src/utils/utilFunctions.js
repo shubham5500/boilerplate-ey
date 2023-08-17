@@ -1,7 +1,3 @@
-export function isEmpty(obj) {
-  return Object.keys(obj).length === 0
-}
-
 export const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()

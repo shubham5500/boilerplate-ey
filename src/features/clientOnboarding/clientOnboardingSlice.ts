@@ -19,19 +19,43 @@ export const postCreateClient = createAsyncThunk(
   },
 )
 
+export const getClientList = createAsyncThunk(
+  "clientOnboarding/getClientList",
+  async () => {
+    try {
+      const response = await client("/organization/get-organizations", {
+        body: {
+          filters: {},
+          page: 1,
+          query: "",
+          results_per_page: 10,
+          sort_by: "",
+        },
+      })
+      return response.data
+    } catch (error) {}
+  },
+)
+
 const clientOnboardingSlice = createSlice({
   name: "clientOnboarding",
   initialState: {
     clientData: {},
+    clientList: [],
   },
   reducers: {},
   extraReducers(builder) {
     builder
       .addCase(postCreateClient.pending, () => {})
       .addCase(postCreateClient.fulfilled, (state, action) => {
-        state.clientData = action.payload;
+        state.clientData = action.payload
       })
       .addCase(postCreateClient.rejected, () => {})
+      .addCase(getClientList.pending, () => {})
+      .addCase(getClientList.fulfilled, (state, action) => {
+        state.clientList = action.payload
+      })
+      .addCase(getClientList.rejected, () => {})
   },
 })
 

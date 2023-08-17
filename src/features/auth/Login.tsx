@@ -13,8 +13,8 @@ export type Inputs = {
 }
 
 const Login = () => {
-  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>()
   const {
     register,
     handleSubmit,
@@ -30,9 +30,10 @@ const Login = () => {
   const submit: SubmitHandler<Inputs> = async (data) => {
     try {
       const res = await dispatch(postLogin(data)).unwrap()
+      
+      LocalStorageService.set("auth", res)
       reset()
       if (res && res.access_token) {
-        LocalStorageService.set("auth", res)
         navigate("/")
       }
     } catch (error) {
@@ -44,9 +45,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative">
       <div
-        style={{
-        //   clipPath: "polygon(10% 100%, 0% 100%, 0 0)",
-        }}
+        style={
+          {
+            //   clipPath: "polygon(10% 100%, 0% 100%, 0 0)",
+          }
+        }
         className="h-full w-full absolute left-0 top-0 bg-primary -z-10"
       ></div>
       <div
@@ -78,8 +81,7 @@ const Login = () => {
               errors={errors}
             />
           </div>
-          <Button
-            type="submit" color="primary">
+          <Button type="submit" classes="w-full" color="primary">
             Log In
           </Button>
         </form>

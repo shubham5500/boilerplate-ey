@@ -13,18 +13,17 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label }) => (
   </li>
 )
 
-const ProfileDropdown: React.FC = () => {
+const ProfileDropdown: React.FC = ({ logout }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const toggleDropdown = (flag: boolean) => {
-    setIsOpen(flag)
+  const toggleDropdown = () => {
+    setIsOpen(flag => !flag)
   }
 
   return (
     <div className="relative inline-block ml-auto">
       <button
-        onMouseEnter={() => toggleDropdown(true)}
-        onMouseLeave={() => toggleDropdown(false)}
+        onClick={toggleDropdown}
         className="flex items-center border mx-3 space-x-2 hover:bg-gray-200 px-4 py-2 transition duration-300"
       >
         <img
@@ -37,7 +36,10 @@ const ProfileDropdown: React.FC = () => {
       {isOpen && (
         <div className="absolute right-0 mt-2 bg-white border rounded-md shadow-lg w-full">
           <ul className="py-1">
-            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-300">
+            <li
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-300"
+              onClick={logout}
+            >
               Logout
             </li>
           </ul>
@@ -48,8 +50,9 @@ const ProfileDropdown: React.FC = () => {
 }
 interface LayoutProps {
   children: React.ReactNode
+  logout: () => void
 }
-const Layout: React.FC<LayoutProps> = ({ children }) => (
+const Layout: React.FC<LayoutProps> = ({ children, logout }) => (
   <div className="flex h-full bg-white">
     {/* Sidebar */}
     <div className="w-1/6 bg-blue-900 text-white p-4 fixed h-full">
@@ -61,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => (
 
     <div className="w-5/6 ml-auto">
       <nav className="flex justify-between items-center bg-white shadow-md px-4 py-2 sticky top-0 z-50">
-        <ProfileDropdown />
+        <ProfileDropdown logout={logout} />
       </nav>
 
       <div className="p-4">{children}</div>

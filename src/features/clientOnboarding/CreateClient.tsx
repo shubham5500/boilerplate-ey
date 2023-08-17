@@ -6,6 +6,7 @@ import Button from "../../components/Button"
 import { fileToBase64 } from "../../utils/utilFunctions"
 import { postCreateClient } from "./clientOnboardingSlice"
 import { useDispatch } from "react-redux"
+import { AppDispatch } from "../../app/store"
 
 export type CreateClientFormInputs = {
   email: string
@@ -25,7 +26,7 @@ const CreateClient = () => {
     reset
   } = useForm<CreateClientFormInputs>();
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [selectedLogo, setSelectedLogo] = useState({})
 

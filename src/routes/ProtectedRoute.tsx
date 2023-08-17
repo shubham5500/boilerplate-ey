@@ -1,14 +1,17 @@
-import { FC } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import Layout from '../components/Layout';
+import { Navigate, Outlet } from "react-router-dom"
+import Layout from "../components/Layout"
+import useAuth from "../hooks/useAuth"
 
-interface ProtectedRouteProps {
-    isAuthenticated: boolean,
+const ProtectedRoutes = () => {
+  const { isAuthenticated, authData, logout } = useAuth()
+
+  return isAuthenticated ? (
+    <Layout logout={logout}>
+      <Outlet />
+    </Layout>
+  ) : (
+    <Navigate to={"/login"} />
+  )
 }
 
-const ProtectedRoutes: FC<ProtectedRouteProps> = ({isAuthenticated}) => {
-
-    return (isAuthenticated ? <Layout><Outlet/></Layout> : <Navigate to={'/login'}/>)
-}
-
-export default ProtectedRoutes;
+export default ProtectedRoutes
