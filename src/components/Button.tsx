@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useCallback } from "react"
 
 interface ButtonProps {
   type?: "submit" | "reset" | "button"
@@ -28,6 +28,11 @@ const Button: FC<ButtonProps> = ({
     btnBackgroundColor = 'bg-primary'
     btnBackgroundHoverColor = 'hover:bg-grey-400'
   }
+
+  if (color === 'secondary') {
+    btnBackgroundColor = 'bg-secondary'
+    btnBackgroundHoverColor = 'hover:bg-primary'
+  }
   const buttonStyles = `
     rounded text-white p-2 transition-all ${
       disabled ? "bg-gray-300 cursor-not-allowed" : `${btnBackgroundColor} ${btnBackgroundHoverColor}`
@@ -35,10 +40,14 @@ const Button: FC<ButtonProps> = ({
     ${classes}
   `
 
+  const handleOnclick = useCallback(() => {
+    onClick && onClick();
+  }, [onClick])
+
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={handleOnclick}
       disabled={disabled}
       className={buttonStyles}
     >

@@ -1,33 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import Table from '../../components/Table'
-import CreateClient from './CreateClient'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../app/store'
-import { getClientList } from './clientOnboardingSlice'
+import { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { AppDispatch, useAppSelector } from "../../app/store"
+import Table, { column } from "../../components/Table"
+import { getClientList } from "./asyncThunks"
+import Button from "../../components/Button"
+import { useNavigate } from "react-router-dom"
 
 const ClientOnboarding = () => {
-
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>()
+  const clients = useAppSelector((state) => state.clientOnboarding.clientList)
   const [loading, setLoading] = useState(false);
 
-  const getClients = async () => {
+  const navigate = useNavigate();
 
-    setLoading(true);
+
+  const getClients = async () => {
+    setLoading(true)
     try {
-      const res = await dispatch(getClientList());
-      setLoading(false);
+      await dispatch(getClientList()).unwrap()
+      setLoading(false)
     } catch (error) {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   useEffect(() => {
     getClients()
   }, [])
+
+  const columns: column[] = [
+    {
+      columnLabel: "Logo",
+      key: "logo",
+      render: (data) => <img src={data} width={32} height={32} />,
+    },
+    {
+      columnLabel: "Organization name",
+      key: "organization_name",
+    },
+    {
+      columnLabel: "Description",
+      key: "description",
+    },
+    {
+      columnLabel: "Sub domain",
+      key: "subdomain",
+    },
+    {
+      columnLabel: "Website",
+      key: "website",
+    },
+  ]
+
+  const actions = (
+    <Button classes="ml-auto text-sm" color="primary" onClick={() => navigate('/onboard')}>
+      Create
+    </Button>
+  )
+
   return (
     <div>
-      <Table gridData={[]}/>
+      <Table
+        heading="Clients"
+        idKey={"organization_id"}
+        columns={columns}
+        gridData={clients.results}
+        actions={actions}
+      />
       {/* <CreateClient/> */}
     </div>
   )

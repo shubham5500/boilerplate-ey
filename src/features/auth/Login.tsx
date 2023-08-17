@@ -6,6 +6,8 @@ import Input from "../../components/Input"
 import { LocalStorageService } from "../../utils/localStorageService"
 import { postLogin } from "./authSlice"
 import Button from "../../components/Button"
+import { useState } from "react"
+import { Spinner } from "../../components/Utils"
 
 export type Inputs = {
   email: string
@@ -15,6 +17,7 @@ export type Inputs = {
 const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
+  const [loading, setLoading] = useState(false)
   const {
     register,
     handleSubmit,
@@ -29,14 +32,19 @@ const Login = () => {
 
   const submit: SubmitHandler<Inputs> = async (data) => {
     try {
+      setLoading(true)
       const res = await dispatch(postLogin(data)).unwrap()
-      
+
       LocalStorageService.set("auth", res)
       reset()
       if (res && res.access_token) {
-        navigate("/")
+        setTimeout(() => {
+          setLoading(false)
+          navigate("/")
+        }, 400)
       }
     } catch (error) {
+      setLoading(false)
       reset()
       console.log({ error })
     }
@@ -81,7 +89,13 @@ const Login = () => {
               errors={errors}
             />
           </div>
-          <Button type="submit" classes="w-full" color="primary">
+          <Button
+            type="submit"
+            classes="w-full flex items-center justify-center"
+            color="primary"
+            disabled={loading}
+          >
+            {loading && <Spinner />}
             Log In
           </Button>
         </form>

@@ -1,6 +1,6 @@
 import {get} from 'lodash';
 
-export const normalizeCreateClientDat = (data) => {
+export const normalizeCreateClientData = (data) => {
     return {
         'description': get(data, 'description', ''),
         'email': get(data, 'email', ''),

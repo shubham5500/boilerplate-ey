@@ -42,7 +42,7 @@ const Dropzone: React.FC<DropzoneProps> = ({multiple, onSelect}) => {
 
   return (
     <div
-      className="border-dashed border-2 border-gray-300 py-6 px-3 text-center rounded-lg mb-6"
+      className="border-dashed border-2 border-gray-300 py-6 px-3 text-center rounded-lg mb-6 flex flex-col"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       onClick={(e) => {
@@ -58,34 +58,34 @@ const Dropzone: React.FC<DropzoneProps> = ({multiple, onSelect}) => {
         className="hidden"
         onChange={handleFileSelect}
       />
-      <p className="text-gray-600">
+      <p className="text-gray-600 cursor-pointer">
         Drop image files here or click to select
       </p>
-      <div className="grid grid-cols-2 gap-4">
-        {files.map((file, index) => (
+      {files.map((file, index) => (
           <div key={index}>
-            <p>{file.name}</p>
             {file.type.startsWith("image/") && (
-              <div>
+              <div className="flex flex-col text-center justify-center">
                 <img
                   src={URL.createObjectURL(file)}
                   alt={file.name}
-                  className="w-full h-auto"
+                  width={48}
+                  height={48}
+                  className="mx-auto my-4"
                 />
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     removeFile(index)
                   }}
-                  className="mt-2 text-red-500 hover:text-red-700 cursor-pointer"
+                  className="text-red-500 hover:text-red-700 cursor-pointer"
                 >
                   Remove
                 </button>
               </div>
             )}
+            <p>{file.name}</p>
           </div>
         ))}
-      </div>
     </div>
   )
 }

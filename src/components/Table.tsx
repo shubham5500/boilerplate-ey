@@ -1,25 +1,34 @@
 import React, { FC } from "react"
+import {get} from 'lodash';
 
-interface GridItem {
-  id: string
-  columnName: string
-  renderKey: string
-  render?: () => React.ReactNode
+export interface column {
+  key: string
+  columnLabel: string
+  render?: (arg1: any, arg2: any) => React.ReactNode,
 }
 
 interface TableProps {
-  gridData: [GridItem] | []
+  heading: string,
+  gridData: any[]
+  columns: column[]
+  actions?: React.ReactNode,
+  idKey?: string,
 }
 
-const Table: FC<TableProps> = ({ gridData }) => {
+const Table: FC<TableProps> = ({ heading, gridData, columns, actions, idKey }) => {
   if (!gridData || !gridData.length) {
     return <div>No data found...</div>
   }
+
+  const key = idKey ? idKey : 'id';
   return (
     <section className="container px-4 mx-auto">
-      <h2 className="text-lg font-medium text-gray-800 dark:text-white">
-        Customers
-      </h2>
+      <div className="flex items-center text-lg font-medium text-gray-800 dark:text-white">
+        {heading || ''}
+        {actions && <span className="ml-auto">
+          {actions}
+        </span>}
+      </div>
 
       <div className="flex flex-col mt-6">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -28,33 +37,27 @@ const Table: FC<TableProps> = ({ gridData }) => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    {gridData.map((item) => (
+                    {columns.map((item) => (
                       <th
-                        key={item.id}
+                        key={item.key}
                         scope="col"
                         className="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
                       >
-                        {item.columnName}
+                        {item.columnLabel}
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                  <tr>
-                    {gridData.map((item) => (
-                      <td className="px-4 py-4 text-sm font-medium whitespace-nowrap">
-                        <div>
-                          <h2 className="font-medium text-gray-800 dark:text-white ">
-                            {/* {item[item.renderKey]} */}
-                            Hello
-                          </h2>
-                          <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                            catalogapp.io
-                          </p>
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
+                  {gridData.map((item) => (
+                    <tr key={item[key]}>
+                      {columns.map((colItem) => (
+                        <td className="px-4 py-4 text-sm font-medium whitespace-nowrap" key={colItem.key}>
+                          <div>{colItem.render ? colItem.render(get(item, colItem.key, ''), item) : item[colItem.key]}</div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -67,20 +70,6 @@ const Table: FC<TableProps> = ({ gridData }) => {
           href="#"
           className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            className="w-5 h-5 rtl:-scale-x-100"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
-            />
-          </svg>
 
           <span>previous</span>
         </a>
@@ -136,20 +125,6 @@ const Table: FC<TableProps> = ({ gridData }) => {
         >
           <span>Next</span>
 
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            className="w-5 h-5 rtl:-scale-x-100"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
-            />
-          </svg>
         </a>
       </div>
     </section>

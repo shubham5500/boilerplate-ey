@@ -1,5 +1,6 @@
 import { FC } from "react"
 import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form"
+import { ObjectType } from "../interfaces/utilsInterface"
 
 interface inputProps {
   id: string
@@ -8,9 +9,10 @@ interface inputProps {
   disabled?: boolean
   required?: boolean
   register: UseFormRegister<any>
-  errors: FieldErrors
+  errors: ObjectType
   classes?: string
   validations?: any,
+  children?: React.ReactNode,
 }
 
 const Input: FC<inputProps> = ({
@@ -22,12 +24,14 @@ const Input: FC<inputProps> = ({
   required,
   errors,
   validations = {},
-  classes = ''
+  classes = '',
+  children,
 }) => {
+  
   return (
     <div className="relative w-full">
       <input
-        {...register(id, { required, ...validations })}
+        {...register(id, { required, ...validations, })}
         type={type}
         id={id}
         disabled={disabled}
@@ -73,6 +77,8 @@ const Input: FC<inputProps> = ({
       >
         {label}
       </label>
+      {children}
+     {errors[id]?.message && <div className="transition-all text-xs text-rose-500 -mt-2 mb-3">{errors[id]?.message || ''}</div>}
     </div>
   )
 }
