@@ -2,13 +2,15 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import { CreateClientFormInputs } from "./CreateClient"
 import { normalizeCreateClientData } from "./normalizer"
 import { client } from "../../utils/client"
+import { createClientUrl, getClientUrl, sliceName } from "./consts"
+import { ClientDataList } from "../../interfaces/clientInterface"
 
 export const postCreateClient = createAsyncThunk(
-    "clientOnboarding/createClient",
+    `${sliceName}/createClient`,
     async (data: CreateClientFormInputs) => {
       try {
         const normalizedData = normalizeCreateClientData(data)
-        const response = await client("/organization/onboard-organization", {
+        const response = await client(createClientUrl, {
           body: normalizedData,
         })
   
@@ -19,11 +21,11 @@ export const postCreateClient = createAsyncThunk(
     },
   )
   
-  export const getClientList = createAsyncThunk(
-    "clientOnboarding/getClientList",
+  export const getClientList = createAsyncThunk<ClientDataList>(
+    `${sliceName}/getClientList`,
     async () => {
       try {
-        const response = await client("/organization/get-organizations", {
+        const response = await client(getClientUrl, {
           body: {
             filters: {},
             page: 1,

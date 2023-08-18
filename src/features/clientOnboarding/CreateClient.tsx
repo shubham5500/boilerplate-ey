@@ -10,7 +10,9 @@ import { Spinner } from "../../components/Utils"
 import { fileToBase64 } from "../../utils/utilFunctions"
 import { postCreateClient } from "./asyncThunks"
 import { useNavigate } from "react-router-dom"
-import Alert from "../../components/Alert"
+import { validWebsiteRegex } from "../../utils/constants"
+
+
 
 export type CreateClientFormInputs = {
   email: string
@@ -41,19 +43,19 @@ const CreateClient = () => {
 
   const onSubmit: SubmitHandler<CreateClientFormInputs> = async (data) => {
     console.log({ data, selectedLogo, errors })
-    // const payload = {
-    //   ...data,
-    //   logo: selectedLogo,
-    // }
-    // try {
-    //   setLoading(true)
-    //   const response = await dispatch(postCreateClient(payload)).unwrap()
-    //   setLoading(false)
-    //   reset()
-    //   navigate("/")
-    // } catch (error) {
-    //   setLoading(false)
-    // }
+    const payload = {
+      ...data,
+      logo: selectedLogo,
+    }
+    try {
+      setLoading(true)
+      const response = await dispatch(postCreateClient(payload)).unwrap()
+      setLoading(false)
+      reset()
+      navigate("/")
+    } catch (error) {
+      setLoading(false)
+    }
   }
 
   const onFileSelect = async (selectedFiles: File[]) => {
@@ -148,6 +150,13 @@ const CreateClient = () => {
         <Input
           label="Website (e.g http://www.example.com)"
           id="website"
+          validations={{
+            required: "Website URL is required",
+            pattern: {
+              value: validWebsiteRegex,
+              message: "Please enter a valid website URL",
+            },
+          }}
           register={register}
           errors={errors}
         />

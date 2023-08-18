@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ClientData, ClientDataList } from "../../interfaces/clientInterface";
 import { getClientList } from "./asyncThunks";
+import { sliceName } from "./consts";
+import { RootState } from "../../app/store";
 
 
 const initialState = {
@@ -9,7 +11,7 @@ const initialState = {
 }
 
 const clientOnboardingSlice = createSlice({
-  name: "clientOnboarding",
+  name: sliceName,
   initialState,
   reducers: {},
   extraReducers(builder) {
@@ -21,6 +23,8 @@ const clientOnboardingSlice = createSlice({
       .addCase(getClientList.rejected, () => {})
   },
 });
+
+export const clientListSelector = (state: RootState) => state.clientOnboarding.clientList;
 
 
 export default clientOnboardingSlice.reducer

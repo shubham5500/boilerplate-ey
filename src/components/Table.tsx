@@ -1,22 +1,48 @@
-import React, { FC } from "react"
-import {get} from 'lodash';
+import React, { FC, useEffect, useState } from "react"
+import {get, isEmpty} from 'lodash';
+import { Pagination, TableColumn, ThunkActionType } from "../interfaces/utilsInterface";
+import { useSelector } from "react-redux";
+import { AppDispatch, RootState, useAppSelector } from "../app/store";
+import { useAppDispatch } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
+import { AsyncThunk } from "@reduxjs/toolkit";
 
-export interface column {
-  key: string
-  columnLabel: string
-  render?: (arg1: any, arg2: any) => React.ReactNode,
+
+interface ListAPIDataInterface extends Pagination {
+  results: Array<any>
 }
 
 interface TableProps {
   heading: string,
-  gridData: any[]
-  columns: column[]
+  columns: TableColumn[]
   actions?: React.ReactNode,
   idKey?: string,
+  dataSelector: (state: RootState) => ListAPIDataInterface,
+  apiFunc: AsyncThunk<any, void, any>,
 }
 
-const Table: FC<TableProps> = ({ heading, gridData, columns, actions, idKey }) => {
-  if (!gridData || !gridData.length) {
+const Table: FC<TableProps> = ({ heading, dataSelector, columns, actions, idKey, apiFunc }) => {
+
+  const data = useAppSelector<ListAPIDataInterface>(dataSelector);
+
+  const dispatch = useAppDispatch()
+  const [loading, setLoading] = useState(false);
+
+  const apiCall = async () => {
+    setLoading(true)
+    try {
+      await dispatch(apiFunc()).unwrap()
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    apiCall()
+  }, [])
+
+  if (isEmpty(data) || !data.results.length) {
     return <div>No data found...</div>
   }
 
@@ -49,7 +75,7 @@ const Table: FC<TableProps> = ({ heading, gridData, columns, actions, idKey }) =
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                  {gridData.map((item) => (
+                  {data.results.map((item) => (
                     <tr key={item[key]}>
                       {columns.map((colItem) => (
                         <td className="px-4 py-4 text-sm font-medium whitespace-nowrap" key={colItem.key}>
