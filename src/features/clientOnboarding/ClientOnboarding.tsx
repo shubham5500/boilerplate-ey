@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
-import { AppDispatch, useAppSelector } from "../../app/store"
-import Table from "../../components/Table"
-import { getClientList } from "./asyncThunks"
-import Button from "../../components/Button"
 import { useNavigate } from "react-router-dom"
-import { clientListSelector } from "./clientOnboardingSlice"
+import Button from "../../components/Button"
+import Table from "../../components/Table"
 import { TableColumn } from "../../interfaces/utilsInterface"
+import { getClientList } from "./asyncThunks"
+import { clientListSelector } from "./clientOnboardingSlice"
 
 const ClientOnboarding = () => {
   const navigate = useNavigate();

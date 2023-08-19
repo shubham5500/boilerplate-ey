@@ -1,37 +1,44 @@
+import { AsyncThunk } from "@reduxjs/toolkit"
+import { get, isEmpty } from "lodash"
 import React, { FC, useEffect, useState } from "react"
-import {get, isEmpty} from 'lodash';
-import { Pagination, TableColumn, ThunkActionType } from "../interfaces/utilsInterface";
-import { useSelector } from "react-redux";
-import { AppDispatch, RootState, useAppSelector } from "../app/store";
-import { useAppDispatch } from "../app/hooks";
-import { useNavigate } from "react-router-dom";
-import { AsyncThunk } from "@reduxjs/toolkit";
+import { useAppDispatch } from "../app/hooks"
+import { RootState, useAppSelector } from "../app/store"
+import { Pagination, TableColumn } from "../interfaces/utilsInterface"
 
-
+enum PaginationEnums {
+  next = "next",
+  prev = "prev",
+}
 interface ListAPIDataInterface extends Pagination {
   results: Array<any>
 }
 
 interface TableProps {
-  heading: string,
+  heading: string
   columns: TableColumn[]
-  actions?: React.ReactNode,
-  idKey?: string,
-  dataSelector: (state: RootState) => ListAPIDataInterface,
-  apiFunc: AsyncThunk<any, void, any>,
+  actions?: React.ReactNode
+  idKey?: string
+  dataSelector: (state: RootState) => ListAPIDataInterface
+  apiFunc: AsyncThunk<any, any, any>
 }
 
-const Table: FC<TableProps> = ({ heading, dataSelector, columns, actions, idKey, apiFunc }) => {
-
-  const data = useAppSelector<ListAPIDataInterface>(dataSelector);
+const Table: FC<TableProps> = ({
+  heading,
+  dataSelector,
+  columns,
+  actions,
+  idKey,
+  apiFunc,
+}) => {
+  const data = useAppSelector<ListAPIDataInterface>(dataSelector)
 
   const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const apiCall = async () => {
+  const apiCall = async (data = {}) => {
     setLoading(true)
     try {
-      await dispatch(apiFunc()).unwrap()
+      await dispatch(apiFunc(data)).unwrap()
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -46,14 +53,26 @@ const Table: FC<TableProps> = ({ heading, dataSelector, columns, actions, idKey,
     return <div>No data found...</div>
   }
 
-  const key = idKey ? idKey : 'id';
+  const pages = Math.ceil(data.total_results / 10)
+
+  const key = idKey ? idKey : "id"
+
+  const onChangePage = (changeType: PaginationEnums) => {
+    if (changeType === PaginationEnums.next) {
+      if (data.page !== pages) {
+        apiCall({ page: data.page + 1 })
+      }
+    } else if (changeType === PaginationEnums.prev) {
+      if (data.page > 1) {
+        apiCall({ page: data.page - 1 })
+      }
+    }
+  }
   return (
     <section className="container px-4 mx-auto">
       <div className="flex items-center text-lg font-medium text-gray-800 dark:text-white">
-        {heading || ''}
-        {actions && <span className="ml-auto">
-          {actions}
-        </span>}
+        {heading || ""}
+        {actions && <span className="ml-auto">{actions}</span>}
       </div>
 
       <div className="flex flex-col mt-6">
@@ -78,8 +97,15 @@ const Table: FC<TableProps> = ({ heading, dataSelector, columns, actions, idKey,
                   {data.results.map((item) => (
                     <tr key={item[key]}>
                       {columns.map((colItem) => (
-                        <td className="px-4 py-4 text-sm font-medium whitespace-nowrap" key={colItem.key}>
-                          <div>{colItem.render ? colItem.render(get(item, colItem.key, ''), item) : item[colItem.key]}</div>
+                        <td
+                          className="px-4 py-4 text-sm font-medium whitespace-nowrap"
+                          key={colItem.key}
+                        >
+                          <div>
+                            {colItem.render
+                              ? colItem.render(get(item, colItem.key, ""), item)
+                              : item[colItem.key]}
+                          </div>
                         </td>
                       ))}
                     </tr>
@@ -92,66 +118,34 @@ const Table: FC<TableProps> = ({ heading, dataSelector, columns, actions, idKey,
       </div>
 
       <div className="flex items-center justify-between mt-6">
-        <a
-          href="#"
-          className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+        <span
+          onClick={() => onChangePage(PaginationEnums.prev)}
+          className={`${pages === data.page && 'cursor-not-allowed'} flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
         >
-
           <span>previous</span>
-        </a>
+        </span>
 
         <div className="items-center hidden md:flex gap-x-3">
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60"
-          >
-            1
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            2
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            3
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            ...
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            12
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            13
-          </a>
-          <a
-            href="#"
-            className="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100"
-          >
-            14
-          </a>
+          {Array.from({ length: pages }).map((page, index) => (
+            <span
+              key={index}
+              className={`px-2
+               py-1 text-sm
+                text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60 ${
+                  index + 1 === data.page && "border border-grey"
+                }`}
+            >
+              {index + 1}
+            </span>
+          ))}
         </div>
 
-        <a
-          href="#"
-          className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+        <span
+          className={`${pages === data.page && 'cursor-not-allowed'} flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
+          onClick={() => onChangePage(PaginationEnums.next)}
         >
           <span>Next</span>
-
-        </a>
+        </span>
       </div>
     </section>
   )
