@@ -3,6 +3,7 @@ import Layout from "../components/Layout"
 import useAuth from "../hooks/useAuth"
 
 const ProtectedRoutes = () => {
+  
   const { isAuthenticated, authData, logout } = useAuth()
 
   return isAuthenticated ? (

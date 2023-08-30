@@ -1,12 +1,21 @@
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import Button from "../../components/Button"
 import Table from "../../components/Table"
 import { TableColumn } from "../../interfaces/utilsInterface"
 import { getClientList } from "./asyncThunks"
 import { clientListSelector } from "./clientOnboardingSlice"
+import useAuth from "../../hooks/useAuth"
+import { useEffect } from "react"
 
 const ClientOnboarding = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { authData } = useAuth()
+
+  useEffect(() => {
+    if (authData && authData?.user?.email !== "demo@rewards.com") {
+      navigate("/home")
+    }
+  }, [])
 
   const columns: TableColumn[] = [
     {
@@ -33,7 +42,11 @@ const ClientOnboarding = () => {
   ]
 
   const actions = (
-    <Button classes="ml-auto text-sm" color="primary" onClick={() => navigate('/onboard')}>
+    <Button
+      classes="ml-auto text-sm"
+      color="primary"
+      onClick={() => navigate("/onboard")}
+    >
       Create
     </Button>
   )

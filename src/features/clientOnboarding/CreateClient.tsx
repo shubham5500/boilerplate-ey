@@ -12,8 +12,6 @@ import { postCreateClient } from "./asyncThunks"
 import { useNavigate } from "react-router-dom"
 import { validWebsiteRegex } from "../../utils/constants"
 
-
-
 export type CreateClientFormInputs = {
   email: string
   description: string
@@ -139,12 +137,18 @@ const CreateClient = () => {
           label="Subdomain"
           id="subdomain"
           register={register}
+          validations={{
+            required: "Subdomain is required",
+          }}
           errors={errors}
         />
         <Input
           label="User Name"
           id="userName"
           register={register}
+          validations={{
+            required: "User Name is required",
+          }}
           errors={errors}
         />
         <Input

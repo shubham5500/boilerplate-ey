@@ -33,13 +33,15 @@ const Table: FC<TableProps> = ({
   const data = useAppSelector<ListAPIDataInterface>(dataSelector)
 
   const dispatch = useAppDispatch()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const apiCall = async (data = {}) => {
     setLoading(true)
     try {
       await dispatch(apiFunc(data)).unwrap()
-      setLoading(false)
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
     } catch (error) {
       setLoading(false)
     }
@@ -68,6 +70,8 @@ const Table: FC<TableProps> = ({
       }
     }
   }
+
+  const array = Array.from({ length: 10 })
   return (
     <section className="container px-4 mx-auto">
       <div className="flex items-center text-lg font-medium text-gray-800 dark:text-white">
@@ -94,22 +98,37 @@ const Table: FC<TableProps> = ({
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                  {data.results.map((item) => (
-                    <tr key={item[key]}>
-                      {columns.map((colItem) => (
-                        <td
-                          className="px-4 py-4 text-sm font-medium whitespace-nowrap"
-                          key={colItem.key}
-                        >
-                          <div>
-                            {colItem.render
-                              ? colItem.render(get(item, colItem.key, ""), item)
-                              : item[colItem.key]}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {loading &&
+                    array.map((item, index) => (
+                      <tr key={index} className="w-full">
+                        {columns.map((item) => (
+                          <td className="p-2" key={item.columnLabel}>
+                            <div className="bg-gray-200 h-4 animate-pulse my-1"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+
+                  {!loading &&
+                    data.results.map((item) => (
+                      <tr key={item[key]}>
+                        {columns.map((colItem) => (
+                          <td
+                            className="px-4 py-4 text-sm font-medium whitespace-nowrap"
+                            key={colItem.key}
+                          >
+                            <div>
+                              {colItem.render
+                                ? colItem.render(
+                                    get(item, colItem.key, ""),
+                                    item,
+                                  )
+                                : item[colItem.key]}
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -120,7 +139,9 @@ const Table: FC<TableProps> = ({
       <div className="flex items-center justify-between mt-6">
         <span
           onClick={() => onChangePage(PaginationEnums.prev)}
-          className={`${pages === data.page && 'cursor-not-allowed'} flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
+          className={`${
+            pages === data.page && "cursor-not-allowed"
+          } flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
         >
           <span>previous</span>
         </span>
@@ -141,7 +162,9 @@ const Table: FC<TableProps> = ({
         </div>
 
         <span
-          className={`${pages === data.page && 'cursor-not-allowed'} flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
+          className={`${
+            pages === data.page && "cursor-not-allowed"
+          } flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800`}
           onClick={() => onChangePage(PaginationEnums.next)}
         >
           <span>Next</span>
